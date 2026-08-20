@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --color-brand: #4338ca; --color-brand-dark: #312e81; --color-brand-tint: #eef2ff;
+  --color-accent: #f59e0b; --color-surface: #ffffff; --color-surface-sunken: #f8fafc;
+  --color-border: #e2e8f0; --color-text: #172033; --color-text-muted: #64748b; --color-text-faint: #94a3b8;
+  --color-on-brand: #ffffff; --color-success: #16a34a; --color-success-bg: #dcfce7;
+  --color-danger: #dc2626; --color-danger-bg: #fee2e2; --color-info: #0284c7; --color-info-bg: #e0f2fe;
+  --color-warning: #f59e0b; --color-plum: #9333ea; --color-plum-bg: #f3e8ff;
+  --gradient-brand: linear-gradient(135deg, #312e81, #4f46e5);
+  --gradient-accent: linear-gradient(135deg, #fbbf24, #f97316);
+  --gradient-hero-bg: radial-gradient(circle at 85% 10%, #ddd6fe 0, transparent 28%), linear-gradient(135deg, #f8fafc 0%, #eef2ff 52%, #fdf4ff 100%);
+  --radius-sm: .5rem; --radius-md: .75rem; --radius-lg: 1rem;
+  --shadow-md: 0 10px 30px rgba(30,41,59,.10); --shadow-lg: 0 20px 45px rgba(49,46,129,.16);
+  --font-display: ui-sans-serif, system-ui, sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply m-0 min-w-80 bg-slate-50 font-sans text-slate-800 antialiased; }
+  button, input, select, textarea { font: inherit; }
+  a { @apply text-inherit no-underline; }
+  h1, h2, h3, h4, p { margin-top: 0; }
+  h1, h2, h3, h4 { @apply text-slate-900; font-family: var(--font-display); }
+  #root { min-height: 100vh; }
+}
+
+@layer components {
+  .container { @apply mx-auto w-full max-w-7xl px-6; }
+  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+  .card-pad { @apply p-5; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50; }
+  .btn-sm { @apply rounded-lg px-3 py-1.5 text-xs; }
+  .btn-primary { @apply bg-indigo-600 text-white shadow-sm hover:bg-indigo-700; }
+  .btn-secondary { @apply border border-indigo-200 bg-indigo-50 text-indigo-700 hover:border-indigo-300 hover:bg-indigo-100; }
+  .btn-accent { @apply bg-amber-400 text-amber-950 shadow-sm hover:bg-amber-300; }
+  .btn-ghost { @apply bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-950; }
+  .btn-block { @apply w-full; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[.16em] text-indigo-600; }
+  .page-toolbar { @apply mb-6 flex flex-wrap items-end justify-between gap-4; }
+  .page-toolbar h1 { @apply mb-1 text-2xl font-bold tracking-tight; }
+  .page-toolbar p, .profile-sub { @apply text-sm text-slate-500; }
+  .toolbar-controls { @apply flex flex-wrap items-center gap-2; }
+  .filter-select { @apply rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100; }
+  .table-wrap { @apply overflow-x-auto rounded-xl border border-slate-200; }
+  .data-table { @apply w-full min-w-150 border-collapse text-left text-sm; }
+  .data-table th { @apply bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-500; }
+  .data-table td { @apply border-t border-slate-100 px-4 py-3 text-slate-700; }
+  .data-table tr:hover td { @apply bg-indigo-50/40; }
+  .num { @apply font-mono font-medium text-slate-900; }
+  .field { @apply mb-4 flex flex-col gap-1.5; }
+  .field label { @apply text-sm font-semibold text-slate-700; }
+  .field input, .field select, .field textarea { @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100; }
+  .field.has-error input, .field.has-error select, .field.has-error textarea { @apply border-red-400 focus:border-red-500 focus:ring-red-100; }
+  .error-msg { @apply text-xs font-medium text-red-600; } .hint { @apply text-xs text-slate-400; }
+  .form-banner { @apply mb-4 rounded-xl px-3 py-2 text-sm; } .form-banner.success { @apply bg-emerald-50 text-emerald-700; } .form-banner.error { @apply bg-red-50 text-red-700; }
+  .field-row { @apply grid grid-cols-1 gap-4 md:grid-cols-2; }
+  .auth-page { @apply flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-950 via-indigo-800 to-violet-700 px-4 py-10; }
+  .auth-card { @apply w-full max-w-md p-7 shadow-2xl; } .auth-brand { @apply mb-7 flex items-center justify-center gap-2 text-xl font-bold text-indigo-950; }
+  .auth-sub, .auth-footer { @apply text-center text-sm text-slate-500; } .auth-footer a, .auth-hint a { @apply font-semibold text-indigo-600 hover:text-indigo-800; }
+  .auth-row { @apply mb-4 flex items-center justify-between gap-3 text-sm; } .checkbox-row { @apply flex items-center gap-2 text-slate-600; }
+  .divider { @apply my-6 border-t border-slate-200; }
+  .status-badge { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold; }
+  .status-badge .dot { @apply h-1.5 w-1.5 rounded-full; }
+  .status-badge.success, .status-badge.paid, .status-badge.active, .status-badge.resolved { @apply bg-emerald-50 text-emerald-700; }
+  .status-badge.warning, .status-badge.pending, .status-badge.partial, .status-badge.medium { @apply bg-amber-50 text-amber-700; }
+  .status-badge.danger, .status-badge.overdue, .status-badge.high { @apply bg-red-50 text-red-700; }
+  .status-badge.info, .status-badge.open, .status-badge.low { @apply bg-sky-50 text-sky-700; }
+}
