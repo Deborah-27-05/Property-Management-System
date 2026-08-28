@@ -169,7 +169,6 @@ export default function Home() {
           display: inline-flex; align-items: center; justify-content: center;
           width: 42px; height: 42px; border-radius: 11px; font-size: 19px; margin-bottom: 14px;
           background: var(--color-brand-tint);
-        }
         .feature-icon.tone-info { background: var(--color-info-bg); }
         .feature-icon.tone-accent { background: #FBF2DE; }
         .feature-icon.tone-plum { background: var(--color-plum-bg); }

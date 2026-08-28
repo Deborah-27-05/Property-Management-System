@@ -14,8 +14,8 @@ export default function PropertyDetails() {
   const { properties, units, tenants } = useAppData();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const property = properties.find((p) => p.id === id);
-  const propertyUnits = units.filter((u) => u.propertyId === id);
+  const property = properties.find((p) => string(p.id) === id);
+  const propertyUnits = units.filter((u) =>string( u.propertyId) === id);
 
   if (!property) {
     return (

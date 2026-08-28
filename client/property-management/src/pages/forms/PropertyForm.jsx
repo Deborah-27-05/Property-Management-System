@@ -10,6 +10,8 @@ export default function PropertyForm({ onDone }) {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,21 +27,30 @@ export default function PropertyForm({ onDone }) {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    addProperty(form);
-    setSuccess(true);
-    setForm(initialForm);
-    setTimeout(() => onDone?.(), 700);
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await addProperty(form);
+      setSuccess(true);
+      setForm(initialForm);
+      setTimeout(() => onDone?.(), 700);
+    } catch (err) {
+      setSubmitError(err.message || 'Could not add property. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       {success ? <div className="form-banner success">Property added successfully.</div> : null}
+      {submitError ? <div className="form-banner error">{submitError}</div> : null}
       <FormField label="Property name" name="name" value={form.name} onChange={handleChange} error={errors.name} />
       <FormField label="Location" name="location" value={form.location} onChange={handleChange} error={errors.location} placeholder="e.g. Kilimani, Nairobi" />
       <div className="field-row">
@@ -47,7 +58,9 @@ export default function PropertyForm({ onDone }) {
         <FormField label="Monthly expected rent (KSh)" name="monthlyRent" type="number" min="1" value={form.monthlyRent} onChange={handleChange} error={errors.monthlyRent} />
       </div>
       <FormField label="Description" name="description" as="textarea" rows={3} value={form.description} onChange={handleChange} />
-      <Button type="submit" className="btn-block">Add Property</Button>
+      <Button type="submit" className="btn-block" disabled={submitting}>
+        {submitting ? 'Adding…' : 'Add Property'}
+      </Button>
     </form>
   );
 }

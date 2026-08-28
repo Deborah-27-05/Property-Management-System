@@ -12,7 +12,8 @@ export default function TenantForm({ onDone, defaultPropertyId }) {
   const [form, setForm] = useState({ ...initialForm, propertyId: defaultPropertyId || '' });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
-
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -34,21 +35,30 @@ export default function TenantForm({ onDone, defaultPropertyId }) {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    addTenant(form);
-    setSuccess(true);
-    setForm({ ...initialForm, propertyId: defaultPropertyId || '' });
-    setTimeout(() => onDone?.(), 700);
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await addTenant(form);
+      setSuccess(true);
+      setForm({ ...initialForm, propertyId: defaultPropertyId || '' });
+      setTimeout(() => onDone?.(), 700);
+    } catch (err) {
+      setSubmitError(err.message || 'Could not add tenant. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       {success ? <div className="form-banner success">Tenant added successfully.</div> : null}
+      {submitError ? <div className="form-banner error">{submitError}</div> : null}
       <FormField label="Full name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} />
       <div className="field-row">
         <FormField label="Phone number" name="phone" type="tel" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="0712 345 678" />
@@ -67,7 +77,9 @@ export default function TenantForm({ onDone, defaultPropertyId }) {
         <FormField label="Monthly rent (KSh)" name="monthlyRent" type="number" min="1" value={form.monthlyRent} onChange={handleChange} error={errors.monthlyRent} />
         <FormField label="Lease start date" name="leaseStart" type="date" value={form.leaseStart} onChange={handleChange} error={errors.leaseStart} />
       </div>
-      <Button type="submit" className="btn-block">Add Tenant</Button>
+      <Button type="submit" className="btn-block" disabled={submitting}>
+        {submitting ? 'Adding…' : 'Add Tenant'}
+</Button>
     </form>
   );
 }

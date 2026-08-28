@@ -8,7 +8,7 @@ import PropertyForm from './forms/PropertyForm';
 import { useAppData } from '../context/AppDataContext';
 
 export default function Properties() {
-  const { properties } = useAppData();
+  const { properties, loading, loadError } = useAppData();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,7 +42,16 @@ export default function Properties() {
         </select>
       </div>
 
-      {filtered.length === 0 ? (
+      {loadError ? (
+        <EmptyState
+          title="Couldn't load properties"
+          description={`Is the Flask API running at http://127.0.0.1:5000? (${loadError})`}
+          actionLabel="Add Property"
+          onAction={() => setModalOpen(true)}
+        />
+      ) : loading ? (
+        <p>Loading properties…</p>
+      ) : filtered.length === 0 ? (
         <EmptyState
           title="No properties found"
           description={properties.length === 0 ? 'Add your first property to get started.' : 'Try a different search or filter.'}

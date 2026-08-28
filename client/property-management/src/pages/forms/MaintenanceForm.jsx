@@ -7,12 +7,14 @@ const initialForm = { propertyId: '', unitId: '', issueTitle: '', description: '
 
 export default function MaintenanceForm({ onDone, defaultPropertyId }) {
   const { properties, units, addMaintenanceRequest } = useAppData();
-  const [form, setForm] = useState({ ...initialForm, propertyId: defaultPropertyId || '' });
+  const [form, setForm] = useState({ ...initialForm, propertyId: defaultPropertyId ? String(defaultPropertyId) : '' });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const unitOptions = useMemo(
-    () => units.filter((u) => u.propertyId === form.propertyId),
+    () => units.filter((u) => String(u.propertyId) === form.propertyId),
     [units, form.propertyId]
   );
 
@@ -30,22 +32,32 @@ export default function MaintenanceForm({ onDone, defaultPropertyId }) {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    const unit = units.find((u) => u.id === form.unitId);
-    addMaintenanceRequest({ ...form, tenantId: unit?.tenantId || null });
-    setSuccess(true);
-    setForm({ ...initialForm, propertyId: defaultPropertyId || '' });
-    setTimeout(() => onDone?.(), 700);
+    const unit = units.find((u) => String(u.id) === form.unitId);
+
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await addMaintenanceRequest({ ...form, tenantId: unit?.tenantId || null });
+      setSuccess(true);
+      setForm({ ...initialForm, propertyId: defaultPropertyId ? String(defaultPropertyId) : '' });
+      setTimeout(() => onDone?.(), 700);
+    } catch (err) {
+      setSubmitError(err.message || 'Could not create maintenance request. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       {success ? <div className="form-banner success">Maintenance request created.</div> : null}
+      {submitError ? <div className="form-banner error">{submitError}</div> : null}
       <div className="field-row">
         <FormField label="Property" name="propertyId" as="select" value={form.propertyId} onChange={handleChange} error={errors.propertyId}>
           <option value="">Select property…</option>
@@ -70,7 +82,9 @@ export default function MaintenanceForm({ onDone, defaultPropertyId }) {
         </FormField>
         <FormField label="Date reported" name="dateReported" type="date" value={form.dateReported} onChange={handleChange} error={errors.dateReported} />
       </div>
-      <Button type="submit" className="btn-block">Create Request</Button>
+      <Button type="submit" className="btn-block" disabled={submitting}>
+        {submitting ? 'Creating…' : 'Create Request'}
+      </Button>
     </form>
   );
 }
