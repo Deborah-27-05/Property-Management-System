@@ -75,12 +75,18 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <div className="dash-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p>A snapshot of every property, tenant, and repair right now.</p>
+      <section className="dash-hero">
+        <div className="dash-hero-overlay" />
+        <div className="dash-hero-content">
+          <span className="dash-hero-eyebrow">Your property, your control</span>
+          <h1>Every property, tenant, and repair — one dashboard.</h1>
+          <p>Manage listings, track rent, and stay ahead of maintenance in one place.</p>
+          <div className="dash-hero-actions">
+            <Button onClick={() => setActiveModal('property')}>+ Add Property</Button>
+            <Button variant="secondary" onClick={() => navigate('/properties')}>View Properties</Button>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div className="stat-grid">
         <StatCard label="Total Properties" value={stats.totalProperties} icon="🏢" />
@@ -191,9 +197,22 @@ export default function Dashboard() {
       </Modal>
 
       <style>{`
-        .dash-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
-        .dash-header h1 { font-size: 26px; margin-bottom: 4px; }
-        .dash-header p { margin: 0; font-size: 14px; }
+        .dash-hero {
+          position: relative; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px;
+          min-height: 260px; display: flex; align-items: flex-end; padding: 32px;
+          background: url('https://images.unsplash.com/photo-1757359056339-22968344cce6?fm=jpg&q=70&w=1600&auto=format&fit=crop') center / cover no-repeat;
+        }
+        .dash-hero-overlay {
+          position: absolute; inset: 0;
+          background: linear-gradient(0deg, rgba(10,25,20,.82) 0%, rgba(10,25,20,.45) 55%, rgba(10,25,20,.15) 100%);
+        }
+        .dash-hero-content { position: relative; z-index: 1; max-width: 560px; color: #fff; }
+        .dash-hero-eyebrow { display: block; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #cdeee1; margin-bottom: 10px; }
+        .dash-hero-content h1 { font-size: 28px; margin-bottom: 10px; color: #fff; }
+        .dash-hero-content p { margin: 0 0 20px 0; font-size: 14.5px; color: rgba(255,255,255,.85); }
+        .dash-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .dash-hero-actions .btn-secondary { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.4); color: #fff; backdrop-filter: blur(2px); }
+        .dash-hero-actions .btn-secondary:hover { background: rgba(255,255,255,.25); }
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
         .quick-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
         .weather-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; background: linear-gradient(120deg, #eff6ff, #f8fafc); }

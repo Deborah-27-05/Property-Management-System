@@ -34,16 +34,27 @@ export const unitsApi = {
   list: () => request('/api/units?per_page=200'),
   create: (payload) =>
     request('/api/units', { method: 'POST', body: JSON.stringify(payload) }),
+  update: (id, payload) =>
+    request(`/api/units/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  remove: (id) => request(`/api/units/${id}`, { method: 'DELETE' }),
 };
+
 export const tenantsApi = {
   list: () => request('/api/tenants?per_page=100'),
   create: (payload) =>
     request('/api/tenants', { method: 'POST', body: JSON.stringify(payload) }),
+  update: (id, payload) =>
+    request(`/api/tenants/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  remove: (id) => request(`/api/tenants/${id}`, { method: 'DELETE' }),
 };
+
 export const paymentsApi = {
   list: () => request('/api/payments?per_page=100'),
   create: (payload) =>
     request('/api/payments', { method: 'POST', body: JSON.stringify(payload) }),
+  update: (id, payload) =>
+    request(`/api/payments/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  remove: (id) => request(`/api/payments/${id}`, { method: 'DELETE' }),
 };
 export const maintenanceApi = {
   list: () => request('/api/maintenance?per_page=100'),
@@ -51,4 +62,5 @@ export const maintenanceApi = {
     request('/api/maintenance', { method: 'POST', body: JSON.stringify(payload) }),
   update: (id, payload) =>
     request(`/api/maintenance/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  remove: (id) => request(`/api/maintenance/${id}`, { method: 'DELETE' }),
 };

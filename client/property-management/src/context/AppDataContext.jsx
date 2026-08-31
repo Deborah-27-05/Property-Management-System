@@ -3,8 +3,6 @@ import { propertiesApi, unitsApi, tenantsApi, paymentsApi, maintenanceApi } from
 
 const AppDataContext = createContext(null);
 
-// Properties, units, tenants, payments, and maintenance requests all come
-// from the Flask + PostgreSQL API now.
 function mapProperty(apiProperty, apiUnits) {
   const propertyUnits = apiUnits.filter((u) => u.property_id === apiProperty.id);
   const occupiedUnits = propertyUnits.filter((u) => u.status === 'occupied').length;
@@ -126,6 +124,7 @@ export function AppDataProvider({ children }) {
       .finally(() => setLoading(false));
   }, [refreshAll]);
 
+  // ---------- Properties ----------
   const addProperty = useCallback(
     async (data) => {
       await propertiesApi.create({
@@ -139,6 +138,49 @@ export function AppDataProvider({ children }) {
     [refreshAll]
   );
 
+  const updateProperty = useCallback(
+    async (id, data) => {
+      await propertiesApi.update(id, {
+        name: data.name,
+        location: data.location,
+        description: data.description || '',
+        number_of_units: Number(data.numberOfUnits),
+      });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  const deleteProperty = useCallback(
+    async (id) => {
+      await propertiesApi.remove(id);
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  // ---------- Units ----------
+  const updateUnit = useCallback(
+    async (id, data) => {
+      await unitsApi.update(id, {
+        unit_number: data.unitNumber,
+        monthly_rent: Number(data.monthlyRent),
+        status: data.occupancyStatus === 'Occupied' ? 'occupied' : 'vacant',
+      });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  const deleteUnit = useCallback(
+    async (id) => {
+      await unitsApi.remove(id);
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  // ---------- Tenants ----------
   const addTenant = useCallback(
     async (data) => {
       const newUnit = await unitsApi.create({
@@ -159,6 +201,29 @@ export function AppDataProvider({ children }) {
     [refreshAll]
   );
 
+  const updateTenant = useCallback(
+    async (id, data) => {
+      await tenantsApi.update(id, {
+        full_name: data.fullName,
+        phone: data.phone,
+        email: data.email,
+        lease_start: data.leaseStart,
+        lease_end: data.leaseEnd,
+      });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  const deleteTenant = useCallback(
+    async (id) => {
+      await tenantsApi.remove(id);
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  // ---------- Payments ----------
   const recordPayment = useCallback(
     async (data) => {
       await paymentsApi.create({
@@ -173,6 +238,28 @@ export function AppDataProvider({ children }) {
     [refreshAll]
   );
 
+  const updatePayment = useCallback(
+    async (id, data) => {
+      await paymentsApi.update(id, {
+        amount: Number(data.amount),
+        payment_date: data.paymentDate,
+        payment_method: data.method,
+        status: data.status ? data.status.toLowerCase() : 'paid',
+      });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  const deletePayment = useCallback(
+    async (id) => {
+      await paymentsApi.remove(id);
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  // ---------- Maintenance ----------
   const addMaintenanceRequest = useCallback(
     async (data) => {
       await maintenanceApi.create({
@@ -188,9 +275,29 @@ export function AppDataProvider({ children }) {
     [refreshAll]
   );
 
+  const updateMaintenanceRequest = useCallback(
+    async (id, data) => {
+      await maintenanceApi.update(id, {
+        title: data.issueTitle,
+        description: data.description || '',
+        priority: PRIORITY_TO_API[data.priority] || 'medium',
+      });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
   const updateMaintenanceStatus = useCallback(
     async (id, status) => {
       await maintenanceApi.update(id, { status });
+      await refreshAll();
+    },
+    [refreshAll]
+  );
+
+  const deleteMaintenanceRequest = useCallback(
+    async (id) => {
+      await maintenanceApi.remove(id);
       await refreshAll();
     },
     [refreshAll]
@@ -206,10 +313,20 @@ export function AppDataProvider({ children }) {
       loading,
       loadError,
       addProperty,
+      updateProperty,
+      deleteProperty,
+      updateUnit,
+      deleteUnit,
       addTenant,
+      updateTenant,
+      deleteTenant,
       recordPayment,
+      updatePayment,
+      deletePayment,
       addMaintenanceRequest,
+      updateMaintenanceRequest,
       updateMaintenanceStatus,
+      deleteMaintenanceRequest,
     }),
     [
       properties,
@@ -220,10 +337,20 @@ export function AppDataProvider({ children }) {
       loading,
       loadError,
       addProperty,
+      updateProperty,
+      deleteProperty,
+      updateUnit,
+      deleteUnit,
       addTenant,
+      updateTenant,
+      deleteTenant,
       recordPayment,
+      updatePayment,
+      deletePayment,
       addMaintenanceRequest,
+      updateMaintenanceRequest,
       updateMaintenanceStatus,
+      deleteMaintenanceRequest,
     ]
   );
 
