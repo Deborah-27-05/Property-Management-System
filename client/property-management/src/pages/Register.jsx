@@ -2,14 +2,18 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import FormField from '../components/FormField';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const initialForm = { fullName: '', email: '', phone: '', password: '', confirmPassword: '' };
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,15 +36,23 @@ export default function Register() {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
+    setSubmitError('');
     if (Object.keys(next).length > 0) return;
 
-    // Mock registration only — no account is actually created on a server.
-    setSuccess(true);
-    setForm(initialForm);
+    setSubmitting(true);
+    try {
+      await register(form.email, form.password);
+      setSuccess(true);
+      setForm(initialForm);
+    } catch (err) {
+      setSubmitError(err.message || 'Could not create your account. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (success) {
@@ -53,8 +65,8 @@ export default function Register() {
             Your Nyumba account has been set up. You can now log in and explore the dashboard
             with sample property data.
           </p>
-          <Button className="btn-block" onClick={() => navigate('/login')}>
-            Continue to Login
+          <Button className="btn-block" onClick={() => navigate('/dashboard')}>
+            Go to Dashboard
           </Button>
         </div>
         <style>{`
@@ -80,6 +92,7 @@ export default function Register() {
         <h1>Create your account</h1>
         <p className="auth-sub">Set up Nyumba to start organizing your properties.</p>
 
+        {submitError ? <div className="form-banner error">{submitError}</div> : null}
         <form onSubmit={handleSubmit} noValidate>
           <FormField label="Full name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} autoComplete="name" />
           <FormField label="Email address" name="email" type="email" value={form.email} onChange={handleChange} error={errors.email} autoComplete="email" />
@@ -87,7 +100,9 @@ export default function Register() {
           <FormField label="Password" name="password" type="password" value={form.password} onChange={handleChange} error={errors.password} autoComplete="new-password" />
           <FormField label="Confirm password" name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} autoComplete="new-password" />
 
-          <Button type="submit" className="btn-block">Create Account</Button>
+          <Button type="submit" className="btn-block" disabled={submitting}>
+            {submitting ? 'Creating account…' : 'Create Account'}
+          </Button>
         </form>
 
         <p className="auth-footer">

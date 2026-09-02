@@ -28,16 +28,24 @@ export default function Login() {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     setSubmitError('');
     if (Object.keys(next).length > 0) return;
 
-   
-    login();
-    navigate(redirectTo, { replace: true });
+    setSubmitting(true);
+    try {
+      await login(form.email, form.password);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setSubmitError(err.message || 'Invalid email or password.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -79,7 +87,9 @@ export default function Login() {
             <span className="auth-hint">This demo does not send real credentials anywhere.</span>
           </div>
 
-          <Button type="submit" className="btn-block" size="md">Login</Button>
+          <Button type="submit" className="btn-block" size="md" disabled={submitting}>
+            {submitting ? 'Logging in…' : 'Login'}
+          </Button>
         </form>
 
         <p className="auth-footer">

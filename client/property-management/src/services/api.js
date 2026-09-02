@@ -1,11 +1,28 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const TOKEN_KEY = 'nyumba_token';
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
 
 async function request(path, options = {}) {
+  const token = getToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
     ...options,
   });
-
   let data = null;
   try {
     data = await res.json();
@@ -56,6 +73,7 @@ export const paymentsApi = {
     request(`/api/payments/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
   remove: (id) => request(`/api/payments/${id}`, { method: 'DELETE' }),
 };
+
 export const maintenanceApi = {
   list: () => request('/api/maintenance?per_page=100'),
   create: (payload) =>
@@ -63,4 +81,12 @@ export const maintenanceApi = {
   update: (id, payload) =>
     request(`/api/maintenance/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
   remove: (id) => request(`/api/maintenance/${id}`, { method: 'DELETE' }),
+};
+
+export const authApi = {
+  register: (payload) =>
+    request('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
+  login: (payload) =>
+    request('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  me: () => request('/api/auth/me'),
 };
