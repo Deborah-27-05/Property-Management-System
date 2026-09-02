@@ -14,12 +14,14 @@ def create_app(test_config=None):
 
     init_extensions(app)
 
+    from routes.auth import auth_bp
     from routes.properties import properties_bp
     from routes.units import units_bp
     from routes.tenants import tenants_bp
     from routes.payments import payments_bp
     from routes.maintenance import maintenance_bp
 
+    app.register_blueprint(auth_bp)
     app.register_blueprint(properties_bp)
     app.register_blueprint(units_bp)
     app.register_blueprint(tenants_bp)
