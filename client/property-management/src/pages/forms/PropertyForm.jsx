@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormField from '../../components/FormField';
 import Button from '../../components/Button';
 import { useAppData } from '../../context/AppDataContext';
 
 const initialForm = { name: '', location: '', numberOfUnits: '', monthlyRent: '', description: '' };
 
-export default function PropertyForm({ onDone }) {
-  const { addProperty } = useAppData();
+export default function PropertyForm({ onDone, property }) {
+  const { addProperty, updateProperty } = useAppData();
+  const isEditing = !!property;
+
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  useEffect(() => {
+    if (property) {
+      setForm({
+        name: property.name || '',
+        location: property.location || '',
+        numberOfUnits: property.units != null ? String(property.units) : '',
+        monthlyRent: property.monthlyRent != null ? String(property.monthlyRent) : '',
+        description: property.description || '',
+      });
+    } else {
+      setForm(initialForm);
+    }
+  }, [property]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,12 +52,16 @@ export default function PropertyForm({ onDone }) {
     setSubmitError(null);
     setSubmitting(true);
     try {
-      await addProperty(form);
+      if (isEditing) {
+        await updateProperty(property.id, form);
+      } else {
+        await addProperty(form);
+      }
       setSuccess(true);
-      setForm(initialForm);
+      if (!isEditing) setForm(initialForm);
       setTimeout(() => onDone?.(), 700);
     } catch (err) {
-      setSubmitError(err.message || 'Could not add property. Please try again.');
+      setSubmitError(err.message || `Could not ${isEditing ? 'update' : 'add'} property. Please try again.`);
     } finally {
       setSubmitting(false);
     }
@@ -49,7 +69,9 @@ export default function PropertyForm({ onDone }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      {success ? <div className="form-banner success">Property added successfully.</div> : null}
+      {success ? (
+        <div className="form-banner success">Property {isEditing ? 'updated' : 'added'} successfully.</div>
+      ) : null}
       {submitError ? <div className="form-banner error">{submitError}</div> : null}
       <FormField label="Property name" name="name" value={form.name} onChange={handleChange} error={errors.name} />
       <FormField label="Location" name="location" value={form.location} onChange={handleChange} error={errors.location} placeholder="e.g. Kilimani, Nairobi" />
@@ -59,7 +81,7 @@ export default function PropertyForm({ onDone }) {
       </div>
       <FormField label="Description" name="description" as="textarea" rows={3} value={form.description} onChange={handleChange} />
       <Button type="submit" className="btn-block" disabled={submitting}>
-        {submitting ? 'Adding…' : 'Add Property'}
+        {submitting ? (isEditing ? 'Saving…' : 'Adding…') : (isEditing ? 'Save Changes' : 'Add Property')}
       </Button>
     </form>
   );
