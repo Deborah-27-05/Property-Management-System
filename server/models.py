@@ -1,6 +1,7 @@
 
 from datetime import datetime
 from extensions import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Property(db.Model):
     __tablename__ = "properties"
@@ -28,6 +29,7 @@ class Property(db.Model):
         if include_units:
             data["units"] = [u.to_dict() for u in self.units]
         return data
+    
 class User(db.Model):
     __tablename__ = "users"
 
@@ -37,6 +39,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     properties = db.relationship("Property", back_populates="owner")
+
+    def set_password(self, raw_password):
+        self.password_hash = generate_password_hash(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password_hash(self.password_hash, raw_password)
 
     def to_dict(self):
         return {
