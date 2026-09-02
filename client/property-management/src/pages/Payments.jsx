@@ -9,9 +9,10 @@ import { useAppData } from '../context/AppDataContext';
 const KES = (n) => `KSh ${Number(n).toLocaleString('en-KE')}`;
 
 export default function Payments() {
-  const { payments, tenants, properties, units } = useAppData();
+  const { payments, tenants, properties, units, deletePayment } = useAppData();
   const [statusFilter, setStatusFilter] = useState('All');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingPayment, setEditingPayment] = useState(null);
 
   const getTenantName = (id) => tenants.find((t) => t.id === id)?.fullName || '—';
   const getPropertyName = (id) => properties.find((p) => p.id === id)?.name || '—';
@@ -63,10 +64,16 @@ export default function Payments() {
         getPropertyName={getPropertyName}
         getUnitNumber={getUnitNumber}
         onAddClick={() => setModalOpen(true)}
+        onEdit={setEditingPayment}
+        onDelete={deletePayment}
       />
 
       <Modal title="Record Payment" isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <PaymentForm onDone={() => setModalOpen(false)} />
+      </Modal>
+
+      <Modal title="Edit Payment" isOpen={!!editingPayment} onClose={() => setEditingPayment(null)}>
+        <PaymentForm payment={editingPayment} onDone={() => setEditingPayment(null)} />
       </Modal>
 
       <style>{`

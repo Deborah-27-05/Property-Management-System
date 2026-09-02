@@ -12,6 +12,7 @@ export default function Properties() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingProperty, setEditingProperty] = useState(null);
 
   const filtered = useMemo(() => {
     return properties.filter((p) => {
@@ -61,13 +62,20 @@ export default function Properties() {
       ) : (
         <div className="property-grid">
           {filtered.map((p) => (
-            <PropertyCard key={p.id} property={p} />
+            <PropertyCard key={p.id} property={p} onEdit={setEditingProperty} />
           ))}
         </div>
       )}
 
       <Modal title="Add Property" isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <PropertyForm onDone={() => setModalOpen(false)} />
+      </Modal>
+
+      <Modal title="Edit Property" isOpen={!!editingProperty} onClose={() => setEditingProperty(null)}>
+        <PropertyForm
+          property={editingProperty}
+          onDone={() => setEditingProperty(null)}
+        />
       </Modal>
 
       <style>{`

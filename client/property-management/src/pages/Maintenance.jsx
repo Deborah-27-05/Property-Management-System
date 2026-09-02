@@ -7,10 +7,11 @@ import MaintenanceForm from './forms/MaintenanceForm';
 import { useAppData } from '../context/AppDataContext';
 
 export default function Maintenance() {
-  const { maintenanceRequests, properties, units, tenants, updateMaintenanceStatus } = useAppData();
+  const { maintenanceRequests, properties, units, tenants, updateMaintenanceStatus, deleteMaintenanceRequest } = useAppData();
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingRequest, setEditingRequest] = useState(null);
 
   const getPropertyName = (id) => properties.find((p) => p.id === id)?.name || '—';
   const getUnitNumber = (id) => units.find((u) => u.id === id)?.unitNumber || '—';
@@ -66,6 +67,8 @@ export default function Maintenance() {
               unitNumber={getUnitNumber(m.unitId)}
               tenantName={getTenantName(m.tenantId)}
               onStatusChange={updateMaintenanceStatus}
+              onEdit={setEditingRequest}
+              onDelete={deleteMaintenanceRequest}
             />
           ))}
         </div>
@@ -75,6 +78,9 @@ export default function Maintenance() {
         <MaintenanceForm onDone={() => setModalOpen(false)} />
       </Modal>
 
+      <Modal title="Edit Maintenance Request" isOpen={!!editingRequest} onClose={() => setEditingRequest(null)}>
+        <MaintenanceForm request={editingRequest} onDone={() => setEditingRequest(null)} />
+      </Modal>
       <style>{`
         .page-toolbar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
         .page-toolbar h1 { font-size: 24px; margin-bottom: 4px; }

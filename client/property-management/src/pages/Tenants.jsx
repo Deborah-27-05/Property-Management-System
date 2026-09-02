@@ -7,11 +7,12 @@ import TenantForm from './forms/TenantForm';
 import { useAppData } from '../context/AppDataContext';
 
 export default function Tenants() {
-  const { tenants, properties, units } = useAppData();
+  const { tenants, properties, units, deleteTenant } = useAppData();
   const [search, setSearch] = useState('');
   const [propertyFilter, setPropertyFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingTenant, setEditingTenant] = useState(null);
 
   const getPropertyName = (id) => properties.find((p) => p.id === id)?.name || '—';
   const getUnitNumber = (unitId) => units.find((u) => u.id === unitId)?.unitNumber || '—';
@@ -57,10 +58,16 @@ export default function Tenants() {
         getPropertyName={getPropertyName}
         getUnitNumber={getUnitNumber}
         onAddClick={() => setModalOpen(true)}
+        onEdit={setEditingTenant}
+        onDelete={deleteTenant}
       />
 
       <Modal title="Add Tenant" isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <TenantForm onDone={() => setModalOpen(false)} />
+      </Modal>
+
+      <Modal title="Edit Tenant" isOpen={!!editingTenant} onClose={() => setEditingTenant(null)}>
+        <TenantForm tenant={editingTenant} onDone={() => setEditingTenant(null)} />
       </Modal>
 
       <style>{`
