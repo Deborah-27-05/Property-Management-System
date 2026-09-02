@@ -34,8 +34,8 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-amber-400 font-bold text-amber-950">{user?.fullName?.charAt(0) || 'U'}</div>
-            <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{user?.fullName || 'Property Manager'}</p><p className="truncate text-xs text-indigo-200">{user?.email}</p></div>
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-amber-400 font-bold text-amber-950">{user?.email?.charAt(0).toUpperCase() || 'U'}</div>
+            <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{user?.email || 'Property Manager'}</p></div>
           </div>
           <button onClick={logout} className="mt-3 w-full rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-indigo-100 transition hover:bg-white/20">Sign out</button>
         </div>
